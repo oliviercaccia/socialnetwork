@@ -21,11 +21,17 @@ function GetAllPosts()
 function SearchInPosts($search)
 {
   global $PDO;
-  $response = $PDO->query(
+  $response = $PDO->prepare(
     "SELECT post.*, user.nickname "
       . "FROM post LEFT JOIN user on (post.user_id = user.id) "
-      . "WHERE content like '%$search%' "
+      . "WHERE content like :search "
       . "ORDER BY post.created_at DESC"
+  );
+  $searchWithPercent = "%$search%";
+  $response->execute(
+    array(
+      "search" => $searchWithPercent
+    )
   );
   return $response->fetchAll();
 }
@@ -40,5 +46,11 @@ function GetAllPostsFromUserId($userId)
 function CreateNewPost($userId, $msg)
 {
   global $PDO;
-  $PDO->exec("INSERT INTO post(user_id, content) values ($userId, '$msg')");
+  $response = $PDO->prepare("INSERT INTO post(user_id, content) values (:userId, :msg)");
+  $response->execute(
+    array(
+      "userId" => $userId,
+      "msg" => $msg
+    )
+  );
 }
