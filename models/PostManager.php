@@ -36,3 +36,9 @@ function GetAllPostsFromUserId($userId)
   $response = $PDO->query("SELECT * FROM post WHERE user_id = $userId ORDER BY created_at DESC");
   return $response->fetchAll();
 }
+
+function CreateNewPost($userId, $msg)
+{
+  global $PDO;
+  $PDO->exec("INSERT INTO post(user_id, content) values ($userId, '$msg')");
+}
